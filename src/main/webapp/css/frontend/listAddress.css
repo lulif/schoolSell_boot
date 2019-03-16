@@ -1,0 +1,18 @@
+.new-item-badge {
+    position: absolute;
+    background: red;
+    z-index: 999;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 70%;
+    padding: 2px 4px 0;
+    left: -10px;
+    line-height: 1.4;
+    -ms-transform: rotate(-7deg);
+    -webkit-transform: rotate(-7deg);
+    transform: rotate(-7deg);
+    -webkit-transition: 0 0.1s ease-in;
+    -moz-transition: 0 0.1s ease-in;
+    -o-transition: 0 0.1s ease-in;
+    transition: transform 0.1s ease-in;
+}

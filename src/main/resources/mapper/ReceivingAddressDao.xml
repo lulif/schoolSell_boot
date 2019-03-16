@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.ReceivingAddressDao">
+	<resultMap type="com.gdxx.entity.ReceivingAddress"
+		id="receivingAddressResultMap">
+		<id column="address_id" property="addressId" />
+		<result column="location" property="location" />
+		<result column="location_details" property="locationDetails" />
+		<result column="contact_name" property="contactName" />
+		<result column="contact_phone" property="contactPhone" />
+		<result column="priority" property="priority" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateDate" />
+		<association property="user" column="user_id"
+			javaType="com.gdxx.entity.PersonInfo">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+			<result column="email" property="email" />
+			<result column="enable_status" property="enableStatus" />
+			<result column="user_type" property="userType" />
+		</association>
+	</resultMap>
+	<select id="queryReceivingAddressList"
+		resultMap="receivingAddressResultMap">
+		select
+		ra.address_id,ra.location,ra.location_details,ra.contact_name,ra.contact_phone,
+		ra.priority,u.user_id,u.user_name,u.email,u.enable_status,u.user_type
+		from receiving_address ra,person_info u
+		<where>
+			ra.user_id=u.user_id
+			and u.user_id=#{userId}
+		</where>
+		order by ra.priority desc,ra.create_time desc
+		limit
+		#{rowIndex},
+		#{pageSize};
+	</select>
+
+	<select id="queryReceivingAddressCount" resultType="int">
+		select
+		count(1) from receiving_address ra,person_info u
+		<where>
+			ra.user_id=u.user_id
+			and u.user_id=#{userId}
+		</where>
+	</select>
+
+	<select id="queryDefaultReceivingAddress"
+		resultMap="receivingAddressResultMap">
+		select
+		address_id,location,location_details,contact_name,contact_phone,
+		priority
+		from receiving_address
+		<where>
+			user_id=#{userId}
+			and
+			priority=1
+		</where>
+
+	</select>
+
+	<insert id="insertReceivingAddress"
+		parameterType="com.gdxx.entity.ReceivingAddress"
+		useGeneratedKeys="true" keyColumn="address_id" keyProperty="addressId">
+		insert into
+		receiving_address(location,location_details,contact_name,contact_phone,priority,user_id,create_time,update_time)
+		values(#{receivingAddress.location},#{receivingAddress.locationDetails},#{receivingAddress.contactName},#{receivingAddress.contactPhone},#{receivingAddress.priority},
+		#{receivingAddress.user.userId},#{receivingAddress.createTime},#{receivingAddress.updateTime}
+		);
+	</insert>
+
+	<delete id="deleteReceivingAddressById">
+		delete from receiving_address
+		<where>
+			user_id=#{userId}
+			and
+			address_id=#{addressId}
+		</where>
+	</delete>
+
+	<update id="updateReceivingAddress"
+		parameterType="com.gdxx.entity.ReceivingAddress">
+		update receiving_address
+		<set>
+			<if test="receivingAddress.location!=null">
+				location=#{receivingAddress.location},
+			</if>
+			<if test="receivingAddress.locationDetails!=null">
+				location_details=#{receivingAddress.locationDetails},
+			</if>
+			<if test="receivingAddress.contactName!=null">
+				contact_name=#{receivingAddress.contactName},
+			</if>
+			<if test="receivingAddress.contactPhone!=null">
+				contact_phone=#{receivingAddress.contactPhone},
+			</if>
+			<if test="receivingAddress.priority!=null">
+				priority=#{receivingAddress.priority},
+			</if>
+			<if test="receivingAddress.updateTime!=null">
+				update_time=#{receivingAddress.updateTime}
+			</if>
+		</set>
+		<where>
+			user_id=#{receivingAddress.user.userId}
+			and
+			address_id=#{receivingAddress.addressId}
+		</where>
+	</update>
+
+	<update id="updateDefaultSetZero">
+		update receiving_address as ra inner join (select
+		address_id,priority from
+		receiving_address where priority=1 and
+		user_id=#{userId}) as temp
+		on
+		ra.address_id=temp.address_id set
+		ra.priority=0;
+	</update>
+
+	<update id="updateSetDefaultToOne">
+		update
+		receiving_address set priority=1 where
+		address_id=#{addressId};
+	</update>
+
+	<select id="queryReceivingAddressById"
+		resultType="com.gdxx.entity.ReceivingAddress">
+		select
+		address_id,location,location_details,contact_name,contact_phone
+		from
+		receiving_address where address_id=#{addressId}
+	</select>
+
+</mapper>

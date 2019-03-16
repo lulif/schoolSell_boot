@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="stylesheet"
+	href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+<link rel="stylesheet"
+	href="//g.alicdn.com/msui/sm/0.6.2/css/??sm.min.css,sm-extend.min.css">
+<link
+	href="https://cdn.bootcss.com/jquery-toast-plugin/1.3.2/jquery.toast.css"
+	rel="stylesheet">
+</head>
+<body>
+	<header class="bar bar-nav">
+		<h1 class='title' id="tt">编辑地址</h1>
+	</header>
+	<div class="content">
+		<div class="list-block">
+			<ul>
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-name"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">
+								所在地点
+								<svg class="icon" id="map"
+									style="width: 1.5em; height: 1.5em; vertical-align: middle; fill: currentColor; overflow: hidden;"
+									viewBox="0 0 1024 1024" version="1.1"
+									xmlns="http://www.w3.org/2000/svg" p-id="1626">
+									<path
+										d="M510.4 57.6c-158.4 0-296 128-296 284.8 0 145.6 292.8 494.4 292.8 494.4s302.4-344 302.4-494.4c0-156.8-142.4-284.8-299.2-284.8z m4.8 392c-54.4 0-99.2-43.2-99.2-97.6 0-54.4 44.8-97.6 99.2-97.6s99.2 43.2 99.2 97.6-44.8 97.6-99.2 97.6z"
+										fill="#E60012" p-id="1627"></path>
+									<path
+										d="M609.6 844.8c1.6 3.2 1.6 4.8 1.6 8 0 27.2-44.8 48-99.2 48-54.4 0-99.2-22.4-99.2-48 0-3.2 0-4.8 1.6-8-60.8 11.2-100.8 32-100.8 56 0 35.2 89.6 65.6 198.4 65.6 110.4 0 198.4-28.8 198.4-65.6 0-24-40-44.8-100.8-56z"
+										fill="" p-id="1628"></path></svg>
+							</div>
+							<div class="item-input">
+								<input type="text" id="location" placeholder="公司/小区/学校">
+
+							</div>
+						</div>
+					</div>
+				</li>
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-name"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">详细地址</div>
+							<div class="item-input">
+								<input type="text" id="locationDetails"
+									placeholder="楼栋号，单元室，门牌号等">
+							</div>
+						</div>
+					</div>
+				</li>
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-name"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">联系人</div>
+							<div class="item-input">
+								<input type="text" id="contactName" placeholder="您的姓名">
+							</div>
+						</div>
+					</div>
+				</li>
+				<!-- 联系电话 text -->
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-name"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">联系电话</div>
+							<div class="item-input">
+								<input type="text" id="contactPhone" placeholder="请填写收获手机号码">
+							</div>
+						</div>
+					</div>
+				</li>
+				<!-- 验证码  kaptcha -->
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-name"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">验证码</div>
+							<input type="text" id="j_captcha" placeholder="验证码"
+								style="width: 60%">
+							<div class="item-input">
+								&nbsp;&nbsp;<img id="captcha_img" alt="点击更换" title="点击更换"
+									onclick="changeVerifyCode(this)" src="/schoolSell_boot/Kaptcha">
+							</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="content-block">
+			<div class="row">
+				<div class="col-50">
+					<a href="#" onclick="window.history.back();"
+						class="button button-big button-fill button-danger">返回</a>
+				</div>
+				<div class="col-50">
+					<a href="#" class="button button-big button-fill button-success"
+						id="submit">保存</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	<script
+		src="https://cdn.bootcss.com/jquery-toast-plugin/1.3.2/jquery.toast.js"></script>
+	<script type='text/javascript'
+		src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+	<script type='text/javascript'
+		src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+	<script type="text/javascript"
+		src="/schoolSell_boot/js/frontend/addReceivingAddress.js"
+		charset='utf-8'></script>
+	<script type="text/javascript"
+		src="/schoolSell_boot/js/common/common.js"></script>
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+</body>
+</html>

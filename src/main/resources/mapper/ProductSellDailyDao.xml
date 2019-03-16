@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.ProductSellDailyDao">
+	<resultMap type="com.gdxx.entity.ProductSellDaily"
+		id="productSellDailyResultMap">
+		<id column="product_sell_daily_id" property="productSellDailyId" />
+		<result column="total" property="total" />
+		<result column="create_time" property="createTime" />
+		<association property="product" column="product_id"
+			javaType="com.gdxx.entity.Product">
+			<id column="product_id" property="productId" />
+			<result column="product_name" property="productName" />
+		</association>
+		<association property="shop" column="shop_id"
+			javaType="com.gdxx.entity.Shop">
+			<id column="shop_id" property="shopId" />
+			<result column="shop_name" property="shopName" />
+		</association>
+	</resultMap>
+	<select id="queryProductSellDaily"
+		resultMap="productSellDailyResultMap">
+		select
+		psd.product_sell_daily_id,
+		psd.create_time,
+		psd.total,
+		s.shop_id,
+		s.shop_name,
+		p.product_id,
+		p.product_name
+		from
+		product_sell_daily psd,
+		shop s,
+		product p
+		<where>
+			psd.shop_id=s.shop_id
+			and
+			psd.product_id=p.product_id
+			<if
+				test="productSellDailyCondition.shop!=null and productSellDailyCondition.shop.shopId!=null">
+				and psd.shop_id=#{productSellDailyCondition.shop.shopId}
+			</if>
+			<if
+				test="productSellDailyCondition.product!=null and productSellDailyCondition.product.productName!=null">
+				and p.product_name like
+				'%${productSellDailyCondition.product.productName}%'
+			</if>
+			<!-- 使用date_format(....,'%Y-%m-%d') 因为传过来的有小时分钟，传到数据库应该把这些都去掉 -->
+			<if test="beginTime!=null and endTime!=null">
+				and date_format(psd.create_time,'%Y-%m-%d') between
+				date_format(#{beginTime},'%Y-%m-%d') and
+				date_add(#{endTime},interval 1 day)
+			</if>
+			<if test="beginTime!=null and endTime==null">
+				and date_format(psd.create_time,'%Y-%m-%d') &gt;=
+				date_format(#{beginTime},'%Y-%m-%d')
+			</if>
+			<if test="beginTime==null and endTime!=null">
+				and date_format(psd.create_time,'%Y-%m-%d') &lt;=
+				date_format(#{endTime},'%Y-%m-%d')
+			</if>
+		</where>
+		order by psd.product_id,psd.create_time desc<!-- 为了迎合echarts的格式，所以要按顺序 -->
+	</select>
+
+	<insert id="insertProductSellDaily">
+		insert into product_sell_daily(product_id,shop_id,create_time,total)
+		(select
+		product_id,shop_id,date_format(create_time,'%Y-%m-%d'),count(product_id)
+		AS total
+		from user_product_map
+		where
+		date_format(create_time,'%Y-%m-%d')=date_sub(curdate(),interval 1 day) <!--表示前一天 -->
+		group by product_id )
+	</insert>
+
+	<insert id="insertDefaultProductSellDaily">
+		insert into product_sell_daily(product_id,shop_id,create_time,total)
+		(select p.product_id,p.shop_id,date_sub(curdate(),interval 1 day),0 AS
+		total
+		from product p
+		where p.product_id not in
+		(select product_id from product_sell_daily
+		where date_format(create_time,'%Y-%m-%d')=date_sub(curdate(),interval 1
+		day) <!--表示前一天 -->
+		)
+		)
+	</insert>
+
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.CustomerCommentDao">
+	<resultMap type="com.gdxx.entity.CustomerComment"
+		id="customerCommentResultMap">
+		<id column="customer_comment_id" property="customerCommentId" />
+		<result column="create_time" property="createTime" />
+		<result column="comment_point" property="commentPoint" />
+		<result column="comment_content" property="commentContent" />
+		<result column="user_product_id" property="userProductId" />
+		<association javaType="com.gdxx.entity.PersonInfo"
+			property="customer" column="customer_id">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		</association>
+		<association property="shop" column="shop_id"
+			javaType="com.gdxx.entity.Shop">
+			<id column="shop_id" property="shopId" />
+			<result column="shop_name" property="shopName" />
+		</association>
+		<association property="product" column="product_id"
+			javaType="com.gdxx.entity.Product">
+			<id column="product_id" property="productId" />
+			<result column="product_name" property="productName" />
+			<result column="img_addr" property="imgAddr" />
+		</association>
+	</resultMap>
+
+	<insert id="insertCustomerComment" useGeneratedKeys="true"
+		keyProperty="customerCommentId" keyColumn="customer_comment_id">
+		insert into
+		customer_comment(customer_id,product_id,shop_id,comment_point,comment_content,create_time,user_product_id)
+		values(#{customer.userId},#{product.productId},#{shop.shopId},#{commentPoint},#{commentContent},#{createTime},#{userProductId})
+	</insert>
+
+	<delete id="deleteCustomerCommentById">
+		delete from customer_comment where
+		customer_comment_id=#{customerCommentId}
+	</delete>
+
+	<select id="queryCustomerCommentList"
+		resultMap="customerCommentResultMap">
+		select
+		cc.customer_comment_id,cc.create_time,cc.comment_point,cc.comment_content,cc.user_product_id,
+		p.product_id,p.product_name,p.img_addr,c.user_id,c.user_name,s.shop_id,s.shop_name
+		from customer_comment cc,shop s,product p,person_info c
+		<where>
+			cc.customer_id=c.user_id and cc.shop_id=s.shop_id and
+			cc.product_id=p.product_id
+			<if
+				test="comment.customer!=null and comment.customer.userId!=null">
+				and c.user_id=#{comment.customer.userId}
+			</if>
+			<if
+				test="comment.customer!=null and comment.customer.userName!=null">
+				and c.user_name like '%${comment.customer.userName}%'
+			</if>
+
+			<if test="comment.shop!=null and comment.shop.shopId!=null">
+				and s.shop_id=#{comment.shop.shopId}
+			</if>
+			<if test="comment.shop!=null and comment.shop.shopName!=null">
+				and s.shop_name like '%${comment.shop.shopName}%'
+			</if>
+
+			<if
+				test="comment.product!=null and comment.product.productId!=null">
+				and p.product_id=#{comment.product.productId}
+			</if>
+			<if
+				test="comment.product!=null and comment.product.productName!=null">
+				and p.product_name like '%${comment.product.productName}%'
+			</if>
+		</where>
+		order by cc.create_time desc
+		LIMIT #{rowIndex},#{pageSize};
+	</select>
+
+	<select id="queryCustomerCommentCount" resultType="int">
+		select count(1)
+		from customer_comment cc,shop s,product p,person_info c
+		<where>
+			cc.customer_id=c.user_id and cc.shop_id=s.shop_id and
+			cc.product_id=p.product_id
+			<if
+				test="comment.customer!=null and comment.customer.userId!=null">
+				and c.user_id=#{comment.customer.userId}
+			</if>
+			<if
+				test="comment.customer!=null and comment.customer.userName!=null">
+				and c.user_name like '%${comment.customer.userName}%'
+			</if>
+
+			<if test="comment.shop!=null and comment.shop.shopId!=null">
+				and s.shop_id=#{comment.shop.shopId}
+			</if>
+			<if test="comment.shop!=null and comment.shop.shopName!=null">
+				and s.shop_name like '%${comment.shop.shopName}%'
+			</if>
+
+			<if
+				test="comment.product!=null and comment.product.productId!=null">
+				and p.product_id=#{comment.product.productId}
+			</if>
+			<if
+				test="comment.product!=null and comment.product.productName!=null">
+				and p.product_name like '%${comment.product.productName}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="queryAvgpointByProIdAndshopId" resultType="double">
+		SELECT AVG(comment_point) FROM customer_comment
+		<where>
+			<if test="productId!=null">
+				and product_id=#{productId}
+			</if>
+			<if test="shopId!=null">
+				and shop_id=#{shopId}
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.UserShoppingCartDao">
+	<resultMap type="com.gdxx.entity.UserShoppingCart"
+		id="ShoppingCartResultMap">
+		<id column="id" property="id" />
+		<result column="create_time" property="createTime" />
+		<association javaType="com.gdxx.entity.PersonInfo"
+			property="user" column="user_id">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		</association>
+		<association property="shop" column="shop_id"
+			javaType="com.gdxx.entity.Shop">
+			<id column="shop_id" property="shopId" />
+			<result column="shop_name" property="shopName" />
+		</association>
+		<association property="product" column="product_id"
+			javaType="com.gdxx.entity.Product">
+			<id column="product_id" property="productId" />
+			<result column="product_name" property="productName" />
+			<result column="img_addr" property="imgAddr" />
+			<result column="point" property="point" />
+			<result column="promotion_price" property="promotionPrice"/>
+		</association>
+	</resultMap>
+
+	<select id="queryUserShoppingCartList"
+		resultMap="ShoppingCartResultMap">
+		select
+		usc.id,s.shop_id,s.shop_name,u.user_id,u.user_name,p.product_id,p.product_name,p.img_addr,p.point,
+		p.promotion_price from user_shopping_cart usc,shop s,person_info u,product p
+		<where>
+			usc.user_id=u.user_id
+			and
+			usc.shop_id=s.shop_id
+			and
+			usc.product_id=p.product_id
+			<if
+				test="shoppingCartCondition.user!=null and shoppingCartCondition.user.userId!=null">
+				and u.user_id = #{shoppingCartCondition.user.userId}
+			</if>
+			<if
+				test="shoppingCartCondition.user!=null and shoppingCartCondition.user.userName!=null">
+				and u.user_name like
+				'%${shoppingCartCondition.user.userName}%'
+			</if>
+			<if
+				test="shoppingCartCondition.shop!=null and shoppingCartCondition.shop.shopId!=null">
+				and s.shop_id = #{shoppingCartCondition.shop.shopId}
+			</if>
+			<if
+				test="shoppingCartCondition.shop!=null and shoppingCartCondition.shop.shopName!=null">
+				and s.shop_name like
+				'%${shoppingCartCondition.shop.shopName}%'
+			</if>
+			<if
+				test="shoppingCartCondition.product!=null and shoppingCartCondition.product.productId!=null">
+				and p.product_id = #{shoppingCartCondition.product.productId}
+			</if>
+			<if
+				test="shoppingCartCondition.product!=null and shoppingCartCondition.product.productName!=null">
+				and p.product_name like
+				'%${shoppingCartCondition.product.productName}%'
+			</if>
+		</where>
+		ORDER BY usc.create_time desc
+		LIMIT #{rowIndex},#{pageSize};
+	</select>
+
+	<select id="queryCartProductCount" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		user_shopping_cart usc,shop s,person_info u,product
+		p
+		<where>
+			usc.user_id=u.user_id
+			and
+			usc.shop_id=s.shop_id
+			and
+			usc.product_id=p.product_id
+			<if
+				test="shoppingCartCondition.user!=null and shoppingCartCondition.user.userId!=null">
+				and u.user_id = #{shoppingCartCondition.user.userId}
+			</if>
+			<if
+				test="shoppingCartCondition.user!=null and shoppingCartCondition.user.userName!=null">
+				and u.user_name like
+				'%${shoppingCartCondition.user.userName}%'
+			</if>
+			<if
+				test="shoppingCartCondition.shop!=null and shoppingCartCondition.shop.shopId!=null">
+				and s.shop_id = #{shoppingCartCondition.shop.shopId}
+			</if>
+			<if
+				test="shoppingCartCondition.shop!=null and shoppingCartCondition.shop.shopName!=null">
+				and s.shop_name like
+				'%${shoppingCartCondition.shop.shopName}%'
+			</if>
+			<if
+				test="shoppingCartCondition.product!=null and shoppingCartCondition.product.productId!=null">
+				and p.product_id = #{shoppingCartCondition.product.productId}
+			</if>
+			<if
+				test="shoppingCartCondition.product!=null and shoppingCartCondition.product.productName!=null">
+				and p.product_name like
+				'%${shoppingCartCondition.product.productName}%'
+			</if>
+		</where>
+		ORDER BY usc.create_time desc
+	</select>
+
+	<select id="queryCartProductById"
+		resultMap="ShoppingCartResultMap">
+		select
+		usc.id,usc.create_time,s.shop_id,s.shop_name,u.user_id,u.user_name,p.product_id,p.product_name,p.img_addr,p.point
+		from user_shopping_cart usc,shop s,person_info u,product p
+		<where>
+			usc.user_id=u.user_id
+			and
+			usc.shop_id=s.shop_id
+			and
+			usc.product_id=p.product_id
+			<if test="id!=null">
+				and usc.id=#{id}
+			</if>
+			<if test="shopId!=null">
+				and usc.shop_id=#{shopId}
+			</if>
+			<if test="productId!=null">
+				and usc.product_id=#{productId}
+			</if>
+			<if test="userId!=null">
+				and usc.user_id=#{userId}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deleteCartProduct">
+		delete from user_shopping_cart where
+		id=#{id}
+	</delete>
+
+	<insert id="insertCartProduct" useGeneratedKeys="true"
+		keyProperty="id" keyColumn="id">
+		insert into
+		user_shopping_cart(user_id,shop_id,product_id,create_time)
+		values(#{user.userId},#{shop.shopId},#{product.productId},#{createTime})
+	</insert>
+
+</mapper>

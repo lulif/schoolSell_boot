@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.UserCollectionMapDao">
+	<resultMap type="com.gdxx.entity.UserCollectionMap"
+		id="userCollectionResultMap">
+		<id column="user_collection_id" property="userCollectionId" />
+		<result column="create_time" property="createTime" />
+		<association javaType="com.gdxx.entity.PersonInfo"
+			property="user" column="user_id">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		</association>
+		<association property="shop" column="shop_id"
+			javaType="com.gdxx.entity.Shop">
+			<id column="shop_id" property="shopId" />
+			<result column="shop_name" property="shopName" />
+		</association>
+		<association property="product" column="product_id"
+			javaType="com.gdxx.entity.Product">
+			<id column="product_id" property="productId" />
+			<result column="product_name" property="productName" />
+			<result column="img_addr" property="imgAddr" />
+			<result column="point" property="point" />
+		</association>
+	</resultMap>
+	<select id="queryUserCollectionMapList"
+		resultMap="userCollectionResultMap">
+		select
+		ucm.user_collection_id,ucm.create_time,s.shop_id,s.shop_name,u.user_id,u.user_name,p.product_id,p.product_name,p.img_addr,p.point
+		from user_collection_map ucm,shop s,person_info u,product p
+		<where>
+			ucm.user_id=u.user_id
+			and
+			ucm.shop_id=s.shop_id
+			and
+			ucm.product_id=p.product_id
+			<if
+				test="userCollectionCondition.user!=null and userCollectionCondition.user.userId!=null">
+				and u.user_id = #{userCollectionCondition.user.userId}
+			</if>
+			<if
+				test="userCollectionCondition.user!=null and userCollectionCondition.user.userName!=null">
+				and u.user_name like
+				'%${userCollectionCondition.user.userName}%'
+			</if>
+			<if
+				test="userCollectionCondition.shop!=null and userCollectionCondition.shop.shopId!=null">
+				and s.shop_id = #{userCollectionCondition.shop.shopId}
+			</if>
+			<if
+				test="userCollectionCondition.shop!=null and userCollectionCondition.shop.shopName!=null">
+				and s.shop_name like
+				'%${userCollectionCondition.shop.shopName}%'
+			</if>
+			<if
+				test="userCollectionCondition.product!=null and userCollectionCondition.product.productId!=null">
+				and p.product_id = #{userCollectionCondition.product.productId}
+			</if>
+			<if
+				test="userCollectionCondition.product!=null and userCollectionCondition.product.productName!=null">
+				and p.product_name like
+				'%${userCollectionCondition.product.productName}%'
+			</if>
+		</where>
+		ORDER BY ucm.create_time desc
+		LIMIT #{rowIndex},#{pageSize};
+	</select>
+
+	<select id="queryUserCollectionMapcount" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		user_collection_map ucm,shop s,person_info u,product
+		p
+		<where>
+			ucm.user_id=u.user_id
+			and
+			ucm.shop_id=s.shop_id
+			and
+			ucm.product_id=p.product_id
+			<if
+				test="userCollectionCondition.user!=null and userCollectionCondition.user.userId!=null">
+				and u.user_id = #{userCollectionCondition.user.userId}
+			</if>
+			<if
+				test="userCollectionCondition.user!=null and userCollectionCondition.user.userName!=null">
+				and u.user_name like
+				'%${userCollectionCondition.user.userName}%'
+			</if>
+			<if
+				test="userCollectionCondition.shop!=null and userCollectionCondition.shop.shopId!=null">
+				and s.shop_id = #{userCollectionCondition.shop.shopId}
+			</if>
+			<if
+				test="userCollectionCondition.shop!=null and userCollectionCondition.shop.shopName!=null">
+				and s.shop_name like
+				'%${userCollectionCondition.shop.shopName}%'
+			</if>
+			<if
+				test="userCollectionCondition.product!=null and userCollectionCondition.product.productId!=null">
+				and p.product_id = #{userCollectionCondition.product.productId}
+			</if>
+			<if
+				test="userCollectionCondition.product!=null and userCollectionCondition.product.productName!=null">
+				and p.product_name like
+				'%${userCollectionCondition.product.productName}%'
+			</if>
+		</where>
+		ORDER BY ucm.create_time desc
+	</select>
+
+	<select id="queryUserCollectionById"
+		resultMap="userCollectionResultMap">
+		select
+		ucm.user_collection_id,ucm.create_time,s.shop_id,s.shop_name,u.user_id,u.user_name,p.product_id,p.product_name,p.img_addr,p.point
+		from user_collection_map ucm,shop s,person_info u,product p
+		<where>
+			ucm.user_id=u.user_id
+			and
+			ucm.shop_id=s.shop_id
+			and
+			ucm.product_id=p.product_id
+			<if test="userId!=null">
+				and ucm.user_id=#{userId}
+			</if>
+			<if test="shopId!=null">
+				and ucm.shop_id=#{shopId}
+			</if>
+			<if test="productId!=null">
+				and
+				ucm.product_id=#{productId}
+			</if>
+			<if test="userCollectionId!=null">
+				and ucm.user_collection_id=#{userCollectionId}
+			</if>
+
+		</where>
+	</select>
+
+	<delete id="deleteUserCollection">
+		delete from user_collection_map where
+		user_collection_id=#{userCollectionId}
+	</delete>
+
+	<insert id="insertUserCollection" useGeneratedKeys="true"
+		keyProperty="userCollectionId" keyColumn="user_collection_id">
+		insert into
+		user_collection_map(user_id,shop_id,product_id,create_time)
+		values(#{user.userId},#{shop.shopId},#{product.productId},#{createTime})
+	</insert>
+
+
+</mapper>

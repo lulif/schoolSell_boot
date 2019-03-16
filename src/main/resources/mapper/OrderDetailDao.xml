@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdxx.dao.OrderDetailDao">
+	<insert id="insertOrderDetailList"
+		parameterType="java.util.List">
+		insert into order_detail(order_id,product_id,product_number,shop_id)
+		values
+		<foreach collection="list" item="orderDetail" index="index"
+			separator=",">
+			(
+			#{orderDetail.orderId},
+			#{orderDetail.productId},
+			#{orderDetail.productNumber},
+			#{orderDetail.shopId}
+			)
+		</foreach>
+	</insert>
+
+
+</mapper>
